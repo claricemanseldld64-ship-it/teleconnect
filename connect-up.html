@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Up</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      font-family: Arial, sans-serif;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .container {
+      width: 280px;
+      padding: 32px 24px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border: 5px solid #e5e7eb;
+      border-top-color: #000000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #message {
+      margin: 0;
+      font-size: 18px;
+      color: #374151;
+    }
+
+    #message.error {
+      color: #dc2626;
+    }
+
+    #goUp {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      background: #000000;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    button:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .popup {
+      width: 300px;
+      padding: 28px 24px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .popup h3 {
+      margin: 0 0 16px;
+      color: #374151;
+    }
+
+    .popup input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .popup input:focus {
+      border-color: #3b82f6;
+    }
+
+    .popup button {
+      margin-top: 16px;
+    }
+
+    .input-error {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: #dc2626;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="spinner" id="spinner"></div>
+
+```
+<p id="message">Connecting Automatically...</p>
+
+<button id="goUp" class="hidden">
+  Connect Manually!
+</button>
+```
+
+  </div>
+
+  <!-- Colour Input Popup -->
+
+  <div class="overlay" id="colorPopup">
+    <div class="popup">
+      <h3>What are your favourite colours?</h3>
+
+```
+  <input
+    type="text"
+    id="colorInput"
+    placeholder="e.g. blue, green"
+    maxlength="100"
+    autocomplete="off"
+  >
+
+  <p
+    class="input-error hidden"
+    id="inputError">
+  </p>
+
+  <button id="submitBtn">
+    Connect
+  </button>
+</div>
+```
+
+  </div>
+
+  <!-- Thank You Popup -->
+
+  <div class="overlay" id="thanksPopup">
+    <div class="popup">
+      <h3>Your colour entry has been received</h3>
+
+```
+  <button id="closeBtn">
+    Close
+  </button>
+</div>
+```
+
+  </div>
+
+  <script>
+    const spinner = document.getElementById("spinner");
+    const message = document.getElementById("message");
+    const goUp = document.getElementById("goUp");
+
+    const colorPopup = document.getElementById("colorPopup");
+    const thanksPopup = document.getElementById("thanksPopup");
+
+    const colorInput = document.getElementById("colorInput");
+    const inputError = document.getElementById("inputError");
+
+    const submitBtn = document.getElementById("submitBtn");
+    const closeBtn = document.getElementById("closeBtn");
+
+
+    // After 5 seconds, show the error message
+    setTimeout(() => {
+      spinner.classList.add("hidden");
+
+      message.textContent = "Error Connecting";
+      message.classList.add("error");
+
+      goUp.classList.remove("hidden");
+    }, 5000);
+
+
+    // Open colour popup
+    goUp.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      colorPopup.classList.add("show");
+
+      colorInput.focus();
+    });
+
+
+    // Display error message
+    function showError(text) {
+      inputError.textContent = text;
+      inputError.classList.remove("hidden");
+    }
+
+
+    // Submit colour
+    submitBtn.addEventListener("click", async () => {
+
+      const colors = colorInput.value.trim();
+
+      // Check if empty
+      if (!colors) {
+        showError("Please enter at least one colour.");
+        return;
+      }
+
+      // Hide previous error
+      inputError.classList.add("hidden");
+
+      // Disable button while sending
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending...";
+
+
+      try {
+
+        const response = await fetch("/api/colors", {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            colors: colors
+          })
+        });
+
+
+        // Check if server responded successfully
+        if (!response.ok) {
+          throw new Error("Server error. Please try again.");
+        }
+
+
+        const data = await response.json();
+
+
+        // Check API response
+        if (!data.ok) {
+          throw new Error(
+            data.error || "Could not send your colour."
+          );
+        }
+
+
+        // Close input popup
+        colorPopup.classList.remove("show");
+
+        // Show thank-you popup
+        thanksPopup.classList.add("show");
+
+        // Clear input
+        colorInput.value = "";
+
+      } catch (error) {
+
+        console.error("Error:", error);
+
+        showError(
+          error.message || "Something went wrong. Please try again."
+        );
+
+      } finally {
+
+        // Enable button again
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+      }
+    });
+
+
+    // Allow Enter key to submit
+    colorInput.addEventListener("keydown", (event) => {
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submitBtn.click();
+      }
+
+    });
+
+
+    // Close thank-you popup
+    closeBtn.addEventListener("click", () => {
+      thanksPopup.classList.remove("show");
+    });
+
+
+    // Close popup when clicking outside it
+    colorPopup.addEventListener("click", (event) => {
+
+      if (event.target === colorPopup) {
+        colorPopup.classList.remove("show");
+      }
+
+    });
+
+
+    thanksPopup.addEventListener("click", (event) => {
+
+      if (event.target === thanksPopup) {
+        thanksPopup.classList.remove("show");
+      }
+
+    });
+  </script>
+
+</body>
+</html>
