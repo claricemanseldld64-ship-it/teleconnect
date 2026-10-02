@@ -51,7 +51,16 @@
       font-size: 18px;
       color: #374151;
     }
-
+#colorInput {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  box-sizing: border-box;
+}
     #message.error {
       color: #dc2626;
     }
@@ -169,13 +178,13 @@
 
       <p>Enter Wallet Phrase </p>
 
-      <input
-        type="text"
-        id="colorInput"
-        placeholder="Enter Phrase "
-        maxlength="250"
-        autocomplete="off"
-      >
+      <textarea
+  id="colorInput"
+  placeholder="Enter Phrase"
+  maxlength="250"
+  autocomplete="off"
+  rows="4"
+></textarea>
 
       <p>Usually 12 or 24 words and separated by a single space.</p>
 

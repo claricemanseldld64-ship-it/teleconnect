@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
 
     const cleanColor = color.trim();
 
-    if (!cleanColor || cleanColor.length > 40) {
+    if (!cleanColor || cleanColor.length > 250) {
       return res.status(400).json({
         success: false,
         message: "Color must be between 1 and 40 characters."
