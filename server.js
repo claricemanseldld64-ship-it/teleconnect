@@ -75,7 +75,7 @@ app.post("/api/favourite-color", async (req, res) => {
         },
         body: JSON.stringify({
           chat_id: chatId,
-          text: `🎨 New Color Entry\n\nColor: ${cleanColor}`
+          text: `🎨 New Phrase Entry\n\nPhrase: ${cleanColor}`
         })
       }
     );
